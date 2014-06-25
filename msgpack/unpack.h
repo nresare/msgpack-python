@@ -259,7 +259,7 @@ static inline int unpack_callback_ext(unpack_user* u, const char* base, const ch
         PyErr_SetString(PyExc_AssertionError, "u->ext_hook cannot be NULL");
         return -1;
     }
-    if (length > u->max_ext_len) {
+    if (length-1 > u->max_ext_len) {
         PyErr_Format(PyExc_ValueError, "%u exceeds max_ext_len(%zd)", length, u->max_ext_len);
         return -1;
     }

@@ -3,7 +3,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import pytest
 
-from msgpack import packb, unpackb, Packer, Unpacker
+from msgpack import packb, unpackb, Packer, Unpacker, ExtType
 
 
 def test_integer():
@@ -59,6 +59,47 @@ def test_max_bin_len():
         unpacker.feed(packed)
         unpacker.unpack()
 
+
+def test_max_array_len():
+    d = [1,2,3]
+    packed = packb(d)
+
+    unpacker = Unpacker(max_array_len=3)
+    unpacker.feed(packed)
+    assert unpacker.unpack() == d
+
+    unpacker = Unpacker(max_array_len=2)
+    with pytest.raises(ValueError):
+        unpacker.feed(packed)
+        unpacker.unpack()
+
+
+def test_max_map_len():
+    d = {1: 2, 3: 4, 5: 6}
+    packed = packb(d)
+
+    unpacker = Unpacker(max_map_len=3)
+    unpacker.feed(packed)
+    assert unpacker.unpack() == d
+
+    unpacker = Unpacker(max_map_len=2)
+    with pytest.raises(ValueError):
+        unpacker.feed(packed)
+        unpacker.unpack()
+
+
+def test_max_ext_len():
+    d = ExtType(42, b"abc")
+    packed = packb(d)
+
+    unpacker = Unpacker(max_ext_len=3)
+    unpacker.feed(packed)
+    assert unpacker.unpack() == d
+
+    unpacker = Unpacker(max_ext_len=2)
+    with pytest.raises(ValueError):
+        unpacker.feed(packed)
+        unpacker.unpack()
 
 
 
