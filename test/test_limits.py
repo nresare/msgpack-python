@@ -3,7 +3,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import pytest
 
-from msgpack import packb, unpackb, Packer
+from msgpack import packb, unpackb, Packer, Unpacker
 
 
 def test_integer():
@@ -30,6 +30,36 @@ def test_map_header():
     packer.pack_map_header(2**32-1)
     with pytest.raises((OverflowError, ValueError)):
         packer.pack_array_header(2**32)
+
+
+def test_max_str_len():
+    d = 'x' * 3
+    packed = packb(d)
+
+    unpacker = Unpacker(max_str_len=3)
+    unpacker.feed(packed)
+    assert unpacker.unpack() == d
+
+    unpacker = Unpacker(max_str_len=2)
+    with pytest.raises(ValueError):
+        unpacker.feed(packed)
+        unpacker.unpack()
+
+
+def test_max_bin_len():
+    d = b'x' * 3
+    packed = packb(d, use_bin_type=True)
+
+    unpacker = Unpacker(max_bin_len=3)
+    unpacker.feed(packed)
+    assert unpacker.unpack() == d
+
+    unpacker = Unpacker(max_bin_len=2)
+    with pytest.raises(ValueError):
+        unpacker.feed(packed)
+        unpacker.unpack()
+
+
 
 
 # PyPy fails following tests because of constant folding?
