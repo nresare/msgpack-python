@@ -163,8 +163,7 @@ def unpack(object stream, object object_hook=None, object list_hook=None,
 
 
 cdef class Unpacker(object):
-    """
-    Streaming unpacker.
+    """Streaming unpacker.
 
     arguments:
 
